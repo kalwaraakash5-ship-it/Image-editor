@@ -274,12 +274,12 @@ if base_file and source_file:
             tick   = Image.open(TICK_PATH).convert("RGBA").resize((75, 75), Image.LANCZOS)
 
             section1 = source.crop((58, 300, 730, 545))
-            section2 = source.crop((62, 790, 1021, 1100))
+            section2 = source.crop((62, 790, 1021, 1120))
 
             result = base.copy()
             result.paste(section1, (63, 285), section1)
-            result.paste(section2, (63, 715), section2)
-            result.paste(tick,     (307, 359), tick)
+            result.paste(section2, (63, 700), section2)
+            result.paste(tick,     (325, 359), tick)
 
         st.markdown(
             "<h3 style='color:#f5f5f7;margin-bottom:0.75rem;'>Result</h3>",
