@@ -1,18 +1,28 @@
+import streamlit as st
 import streamlit.components.v1 as components
 
-GA_ID = "G-95Y1S5Z42L"  # <-- Your Google Analytics Measurement ID
+st.set_page_config(page_title="Image Editor", page_icon=None, layout="centered")
 
-components.html(f"""
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){{dataLayer.push(arguments);}}
-  gtag('js', new Date());
-  gtag('config', '{GA_ID}');
-</script>
-""", height=0)
-import streamlit as st
+GA_ID = "G-95Y1S5Z42L"
+
+components.html(
+    f"""
+    <script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>
+    <script>
+      window.parent.dataLayer = window.parent.dataLayer || [];
+      function gtag(){{window.parent.dataLayer.push(arguments);}}
+
+      gtag('js', new Date());
+      gtag('config', '{GA_ID}', {{
+        page_title: document.title,
+        page_path: window.location.pathname,
+      }});
+
+      gtag('event', 'page_view');
+    </script>
+    """,
+    height=0,
+)
 from PIL import Image
 import io
 import os
