@@ -1,3 +1,17 @@
+import streamlit.components.v1 as components
+
+GA_ID = "G-95Y1S5Z42L"  # <-- Your Google Analytics Measurement ID
+
+components.html(f"""
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){{dataLayer.push(arguments);}}
+  gtag('js', new Date());
+  gtag('config', '{GA_ID}');
+</script>
+""", height=0)
 import streamlit as st
 from PIL import Image
 import io
