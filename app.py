@@ -1,33 +1,23 @@
 import streamlit as st
-import streamlit.components.v1 as components
-
-st.set_page_config(page_title="Image Editor", page_icon=None, layout="centered")
-
-GA_ID = "G-95Y1S5Z42L"
-
-components.html(
-    f"""
-    <script async src="https://www.googletagmanager.com/gtag/js?id={GA_ID}"></script>
-    <script>
-      window.parent.dataLayer = window.parent.dataLayer || [];
-      function gtag(){{window.parent.dataLayer.push(arguments);}}
-
-      gtag('js', new Date());
-      gtag('config', '{GA_ID}', {{
-        page_title: document.title,
-        page_path: window.location.pathname,
-      }});
-
-      gtag('event', 'page_view');
-    </script>
-    """,
-    height=0,
-)
 from PIL import Image
 import io
 import os
 
 st.set_page_config(page_title="Image Editor", page_icon=None, layout="centered")
+
+# --- MICROSOFT CLARITY ---
+if "clarity_loaded" not in st.session_state:
+    st.session_state.clarity_loaded = True
+
+    st.markdown("""
+    <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "w28qqjis27");
+    </script>
+    """, unsafe_allow_html=True)
 
 st.markdown("""
 <style>
@@ -234,110 +224,41 @@ st.markdown(
 
 TICK_PATH = os.path.join(os.path.dirname(__file__), "tick.png")
 
-# ── Sidebar: one-time tick image setup ──────────────────
 with st.sidebar:
     st.markdown("## Tick Image")
     tick_exists = os.path.exists(TICK_PATH)
 
     if tick_exists:
-        st.markdown(
-            '<p style="color:#30d158;font-size:0.82rem;font-weight:500;margin-bottom:0.75rem;">'
-            '✓ tick.png is saved</p>',
-            unsafe_allow_html=True
-        )
+        st.markdown('<p style="color:#30d158;">✓ tick.png is saved</p>', unsafe_allow_html=True)
         st.image(Image.open(TICK_PATH), width=80)
-        st.markdown("<br>", unsafe_allow_html=True)
-        replace_file = st.file_uploader(
-            "Replace tick image",
-            type=["png", "jpg", "jpeg", "webp"],
-            key="tick_replace"
-        )
-        if replace_file:
-            img = Image.open(replace_file).convert("RGBA")
-            img.save(TICK_PATH, format="PNG")
-            st.success("Saved! Refresh the page.")
     else:
-        st.markdown(
-            '<p style="color:#ff453a;font-size:0.82rem;font-weight:500;margin-bottom:0.75rem;">'
-            '✗ No tick.png found</p>',
-            unsafe_allow_html=True
-        )
-        upload_tick = st.file_uploader(
-            "Upload tick image",
-            type=["png", "jpg", "jpeg", "webp"],
-            key="tick_upload"
-        )
+        upload_tick = st.file_uploader("Upload tick image")
         if upload_tick:
-            img = Image.open(upload_tick).convert("RGBA")
-            img.save(TICK_PATH, format="PNG")
-            st.success("Saved! Refresh the page.")
+            Image.open(upload_tick).convert("RGBA").save(TICK_PATH, "PNG")
+            st.rerun()
 
-# ── Main uploads ─────────────────────────────────────────
-base_file   = st.file_uploader("Base Image",   type=["png", "jpg", "jpeg", "webp"])
-source_file = st.file_uploader("Source Image", type=["png", "jpg", "jpeg", "webp"])
+base_file = st.file_uploader("Base Image", type=["png","jpg","jpeg","webp"])
+source_file = st.file_uploader("Source Image", type=["png","jpg","jpeg","webp"])
 
 if base_file and source_file:
-    if not os.path.exists(TICK_PATH):
-        st.error("tick.png not found in the app folder. Please add it to artifacts/image-editor/ and restart.")
-    else:
-        col1, col2 = st.columns(2)
-        with col1:
-            st.caption("Base")
-            st.image(Image.open(base_file), width="stretch")
-            base_file.seek(0)
-        with col2:
-            st.caption("Source")
-            st.image(Image.open(source_file), width="stretch")
-            source_file.seek(0)
+    base = Image.open(base_file).convert("RGBA").resize((1080,2400))
+    source = Image.open(source_file).convert("RGBA").resize((1080,2400))
+    tick = Image.open(TICK_PATH).convert("RGBA").resize((75,75))
 
-        st.divider()
+    section1 = source.crop((58,300,730,545))
+    section2 = source.crop((62,790,1021,1120))
 
-        with st.spinner("Processing…"):
-            base   = Image.open(base_file).convert("RGBA").resize((1080, 2400), Image.LANCZOS)
-            source = Image.open(source_file).convert("RGBA").resize((1080, 2400), Image.LANCZOS)
-            tick   = Image.open(TICK_PATH).convert("RGBA").resize((75, 75), Image.LANCZOS)
+    result = base.copy()
+    result.paste(section1,(63,285),section1)
+    result.paste(section2,(63,700),section2)
+    result.paste(tick,(325,359),tick)
 
-            section1 = source.crop((58, 300, 730, 545))
-            section2 = source.crop((62, 790, 1021, 1120))
+    st.image(result)
 
-            result = base.copy()
-            result.paste(section1, (63, 285), section1)
-            result.paste(section2, (63, 700), section2)
-            result.paste(tick,     (325, 359), tick)
+    buf = io.BytesIO()
+    result.convert("RGB").save(buf, format="JPEG", quality=95)
 
-        st.markdown(
-            "<h3 style='color:#f5f5f7;margin-bottom:0.75rem;'>Result</h3>",
-            unsafe_allow_html=True
-        )
-        st.image(result, width="stretch")
-
-        st.markdown("<br>", unsafe_allow_html=True)
-        buf = io.BytesIO()
-        result.convert("RGB").save(buf, format="JPEG", quality=95)
-        st.download_button(
-            label="Download Image",
-            data=buf.getvalue(),
-            file_name="edited_image.jpg",
-            mime="image/jpeg",
-            use_container_width=True,
-        )
+    st.download_button("Download Image", buf.getvalue(), "edited_image.jpg")
 
 else:
-    st.markdown("""
-    <div style="
-        background: #1c1c1e;
-        border-radius: 20px;
-        padding: 3rem 2rem;
-        text-align: center;
-        border: 1px solid rgba(255,255,255,0.08);
-        margin-top: 1rem;
-    ">
-        <div style="font-size:2.8rem;margin-bottom:1.2rem;filter:grayscale(0.2);">🖼️</div>
-        <p style="font-size:1.05rem;font-weight:600;color:#f5f5f7;margin:0 0 0.5rem;">
-            Upload two images to begin
-        </p>
-        <p style="font-size:0.85rem;color:#636366;margin:0;letter-spacing:-0.1px;">
-            Base image &nbsp;·&nbsp; Source image
-        </p>
-    </div>
-    """, unsafe_allow_html=True)
+    st.info("Upload two images to begin")
