@@ -8,7 +8,7 @@ st.set_page_config(page_title="Image Editor", page_icon=None, layout="centered")
 
 CLARITY_ID = "w28qqjis27"
 
-st.markdown(f"""
+components.html(f"""
 <script type="text/javascript">
 (function(c,l,a,r,i,t,y){{
     c[a]=c[a]||function(){{(c[a].q=c[a].q||[]).push(arguments)}};
@@ -16,7 +16,7 @@ st.markdown(f"""
     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 }})(window, document, "clarity", "script", "{CLARITY_ID}");
 </script>
-""", unsafe_allow_html=True)
+""", height=0)
 
 st.markdown("""
 <style>
