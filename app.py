@@ -4,20 +4,19 @@ import io
 import os
 import streamlit.components.v1 as components
 
-# ── Microsoft Clarity ─────────────────────────────
-CLARITY_ID = "w28qqjis27"  # <-- Your Clarity Project ID
-components.html(f"""
-<!-- Microsoft Clarity -->
-<script type="text/javascript">
-    (function(c,l,a,r,i,t,y){{
-        c[a]=c[a]||function(){{(c[a].q=c[a].q||[]).push(arguments)}};
-        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
-        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
-    }})(window, document, "clarity", "script", "{CLARITY_ID}");
-</script>
-""", height=0)
-
 st.set_page_config(page_title="Image Editor", page_icon=None, layout="centered")
+
+CLARITY_ID = "w28qqjis27"
+
+st.markdown(f"""
+<script type="text/javascript">
+(function(c,l,a,r,i,t,y){{
+    c[a]=c[a]||function(){{(c[a].q=c[a].q||[]).push(arguments)}};
+    t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+    y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+}})(window, document, "clarity", "script", "{CLARITY_ID}");
+</script>
+""", unsafe_allow_html=True)
 
 st.markdown("""
 <style>
