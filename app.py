@@ -16,7 +16,7 @@ components.html(f"""
     y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
 }})(window, document, "clarity", "script", "{CLARITY_ID}");
 </script>
-""", height=0)
+""", height=1)
 
 st.markdown("""
 <style>
