@@ -257,7 +257,8 @@ if base_file and source_file:
     buf = io.BytesIO()
     result.convert("RGB").save(buf, format="JPEG", quality=95)
 
-    st.download_button("Download Image", buf.getvalue(), "edited_image.jpg")
+    st.download_button("Download Image", buf.getvalue(), f"{base_file.name.rsplit('.', 1)[0]}.jpg"
+)
 
 else:
     st.info("Upload two images to begin")
